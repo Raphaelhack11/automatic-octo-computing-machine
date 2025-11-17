@@ -638,4 +638,49 @@ export default function App(){
     }
     
     switch (page) {
-      case '
+      case 'Inventory':
+        return <Inventory onPurchase={startPurchase} />; 
+      case 'Pre-Order':
+        return <PreOrder />;
+      case 'About':
+        return <About />;
+      case 'Contact':
+        return <Contact />;
+      case 'Home':
+      default:
+        return (
+          <main>
+            <Inventory onPurchase={startPurchase} />
+          </main>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans">
+      <Nav 
+        current={page} 
+        onChange={setPage} 
+        purchaseActive={purchaseStep > 0}
+      />
+      
+      {purchaseStep === 0 && <Hero onChange={setPage} />}
+      
+      <main className="pb-12">
+        {renderPage()}
+      </main>
+
+      <footer className="border-t mt-12 text-white" style={{backgroundColor: NAVY}}>
+        <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-sm text-gray-400">
+            © {new Date().getFullYear()} BYD Motor Hubs. All rights reserved.
+          </div>
+          <div className="flex gap-4">
+            <a href="#" className="text-sm text-blue-400 hover:text-blue-500 transition-colors">Privacy Policy</a>
+            <a href="#" className="text-sm text-blue-400 hover:text-blue-500 transition-colors">Terms of Use</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
