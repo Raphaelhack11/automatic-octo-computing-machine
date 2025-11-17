@@ -5,23 +5,36 @@ import React, { useState, useEffect, useCallback } from 'react';
 const NAVY = '#0A192F';
 const BLUE = '#0077B6';
 const GRAY_ACCENT = '#4A4E69';
+
+// 1. Placeholder for safety if the main image fails
+const FALLBACK_IMAGE = "https://placehold.co/600x400/e0f2fe/0369a1?text=BYD+Car"; 
+
+// --- STATIC IMAGE PATHS (with cache-busting parameter ?v=2 for forced reload) ---
+const CACHE_VERSION = 'v=20241117'; 
+const IMAGE_ATTO_3 = `/static/1000307655.jpg?${CACHE_VERSION}`;
+const IMAGE_DOLPHIN = `/static/1000307656.jpg?${CACHE_VERSION}`;
+const IMAGE_YUAN_PLUS = `/static/1000307661.jpg?${CACHE_VERSION}`;
+const IMAGE_SEAL = `/static/1000307658.jpg?${CACHE_VERSION}`;
+const IMAGE_HAN = `/static/1000307659.jpg?${CACHE_VERSION}`;
+const IMAGE_QIN_PLUS = `/static/1000307660.jpg?${CACHE_VERSION}`;
+const IMAGE_TANG = `/static/1000307621.jpg?${CACHE_VERSION}`; 
+
 const CARS = [
-  // Added 'priceValue' for easy math in the purchase flow
-  { id: 1, name: "BYD Atto 3", range: "250-315 mi", price: "$29,990", availableInUSA: true, color: 'bg-purple-600', priceValue: 29990 },
-  { id: 2, name: "BYD Dolphin", range: "200-280 mi", price: "$21,990", availableInUSA: true, color: 'bg-emerald-600', priceValue: 21990 },
-  { id: 7, name: "BYD Yuan Plus", range: "180-240 mi", price: "$19,990", availableInUSA: true, color: 'bg-pink-600', priceValue: 19990 },
-  { id: 3, name: "BYD Seal", range: "300-360 mi", price: "$35,990", availableInUSA: false, color: 'bg-red-600', priceValue: 35990 },
-  { id: 4, name: "BYD Han", range: "320-380 mi", price: "$39,990", availableInUSA: false, color: 'bg-orange-600', priceValue: 39990 },
-  { id: 5, name: "BYD Qin PLUS", range: "200-330 mi", price: "$25,990", availableInUSA: false, color: 'bg-cyan-600', priceValue: 25990 },
-  { id: 6, name: "BYD Tang", range: "260-340 mi", price: "$41,900", availableInUSA: false, color: 'bg-indigo-600', priceValue: 41900 },
+  // Each car now references its unique image path with the cache buster
+  { id: 1, name: "BYD Atto 3", range: "250-315 mi", price: "$29,990", availableInUSA: true, color: 'bg-purple-600', priceValue: 29990, img: IMAGE_ATTO_3 },
+  { id: 2, name: "BYD Dolphin", range: "200-280 mi", price: "$21,990", availableInUSA: true, color: 'bg-emerald-600', priceValue: 21990, img: IMAGE_DOLPHIN },
+  { id: 7, name: "BYD Yuan Plus", range: "180-240 mi", price: "$19,990", availableInUSA: true, color: 'bg-pink-600', priceValue: 19990, img: IMAGE_YUAN_PLUS },
+  { id: 3, name: "BYD Seal", range: "300-360 mi", price: "$35,990", availableInUSA: false, color: 'bg-red-600', priceValue: 35990, img: IMAGE_SEAL },
+  { id: 4, name: "BYD Han", range: "320-380 mi", price: "$39,990", availableInUSA: false, color: 'bg-orange-600', priceValue: 39990, img: IMAGE_HAN },
+  { id: 5, name: "BYD Qin PLUS", range: "200-330 mi", price: "$25,990", availableInUSA: false, color: 'bg-cyan-600', priceValue: 25990, img: IMAGE_QIN_PLUS },
+  { id: 6, name: "BYD Tang", range: "260-340 mi", price: "$41,900", availableInUSA: false, color: 'bg-indigo-600', priceValue: 41900, img: IMAGE_TANG },
 ];
-const FALLBACK_IMAGE = "https://placehold.co/600x400/94a3b8/ffffff?text=BYD+Image";
 
 const CRYPTO_WALLETS = {
     'Bitcoin': { address: 'bc1q4c6f7xzsekkpvd2guwkaww4m7se9yjlrxnrjc7', network: 'BTC' },
     'Ethereum': { address: '0x08cfe6ddc3b58b0655dd1c9214bcfddbd3855cca', network: 'ETH' },
     'Litecoin': { address: 'ltc1qattx7q06hrjs7x8jkruyhjw7pavklwetg0j3wl', network: 'LTC' },
-    'USDT_ERC20': { address: '0x08cFE6DDC3b58B0655dD1c9214BcfdDBD3855CCA', network: 'ERC-20' },
+    'USDT_ERC20': { address: '0x08cFE6DDC3b58b0655dD1c9214BcfdDBD3855CCA', network: 'ERC-20' },
 };
 
 // --- CORE UI COMPONENTS ---
@@ -30,7 +43,14 @@ function CopyToClipboard({ text }) {
     const [copied, setCopied] = useState(false);
     
     const handleCopy = () => {
-        navigator.clipboard.writeText(text);
+        // Using document.execCommand('copy') for better compatibility in iframe environments
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -38,7 +58,7 @@ function CopyToClipboard({ text }) {
     return (
         <button 
             onClick={handleCopy}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium ml-4 focus:outline-none"
+            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium focus:outline-none"
         >
             {copied ? 'Copied! ✅' : 'Copy Address'}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -83,6 +103,8 @@ function Nav({ current, onChange, purchaseActive }) {
 }
 
 function Hero({ onChange }) {
+  // Using the Atto 3 image as the main Hero image
+  const HERO_IMAGE = IMAGE_ATTO_3; 
   return (
     <header className={`py-16`} style={{backgroundColor: NAVY}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col-reverse md:flex-row items-center gap-8">
@@ -113,8 +135,9 @@ function Hero({ onChange }) {
         </div>
 
         <div className="w-full md:w-1/2 p-4 bg-gray-900 rounded-2xl shadow-2xl">
+          {/* Uses the unique image path for the Hero car */}
           <img 
-            src="https://placehold.co/800x450/1F2937/ffffff?text=BYD+Hero+Car+Showcase" 
+            src={HERO_IMAGE} 
             alt="BYD Car Showcase" 
             className="w-full h-56 object-cover rounded-xl" 
             onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
@@ -134,6 +157,7 @@ function Card({ car, onPurchase }){
       
       <div className="h-44 flex items-center justify-center relative">
         <img 
+          // Uses car.img which is set in the global CARS array (with cache buster)
           src={car.img} 
           alt={car.name} 
           className="object-cover h-full w-full" 
@@ -326,6 +350,7 @@ function Contact(){
             required 
             name="name" 
             placeholder="Full name" 
+            onChange={() => {}}
             className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" 
           />
           <input 
@@ -333,16 +358,19 @@ function Contact(){
             name="email" 
             type="email" 
             placeholder="Email address" 
+            onChange={() => {}}
             className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" 
           />
           <input 
             name="phone" 
             placeholder="Phone number (optional)" 
+            onChange={() => {}}
             className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" 
           />
           <select 
             required
             name="interest" 
+            onChange={() => {}}
             className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white appearance-none text-gray-700"
           >
             <option value="" disabled defaultValue>Select Inquiry Type *</option>
@@ -355,6 +383,7 @@ function Contact(){
             required
             name="message" 
             placeholder="Your detailed message..." 
+            onChange={() => {}}
             className="p-3 border border-gray-300 rounded-lg col-span-1 sm:col-span-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
             rows={5}
           ></textarea>
@@ -395,9 +424,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
   const handleCryptoSelect = (e) => {
     const cryptoKey = e.target.value;
     setSelectedCrypto(cryptoKey);
-    if (cryptoKey) {
-        setFlowStep(4);
-    }
+    // Setting flow step to 4 happens in case 3's select onChange listener for smoother flow
   };
 
   const LoadingStep = ({ nextStep }) => {
@@ -425,9 +452,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
   };
 
   const renderStepContent = () => {
-    const isFinalPaymentStep = flowStep === 8;
-    const paymentAmount = isFinalPaymentStep ? car.price : `$${depositAmount.toFixed(2)}`;
-    const walletInfo = CRYPTO_WALLETS[selectedCrypto];
+    const walletInfo = CRYPTO_WALLETS[selectedCrypto] || {};
 
     switch (flowStep) {
       case 1: 
@@ -467,7 +492,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
             <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>3. Select Crypto Payment Method</h4>
             <p className="text-gray-600 mb-6">Select a network to display the corresponding wallet address for the **${depositAmount.toFixed(2)}** fee.</p>
 
-            <select onChange={handleCryptoSelect} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium">
+            <select onChange={(e) => { handleCryptoSelect(e); setFlowStep(4); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium">
                 <option value="" disabled>-- Choose Cryptocurrency --</option>
                 {Object.keys(CRYPTO_WALLETS).map(key => (
                     <option key={key} value={key}>{key}</option>
@@ -530,7 +555,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
                 <option value="" disabled>-- Choose Cryptocurrency --</option>
                 {Object.keys(CRYPTO_WALLETS).map(key => (
                     <option key={key} value={key}>{key}</option>
-                )}
+                ))}
             </select>
           </div>
         );
@@ -568,7 +593,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
             
             <div className="mt-6 p-5 bg-green-50 rounded-xl border border-green-300 text-left mx-auto max-w-lg shadow-md">
                 <p className="font-semibold text-gray-800">Car: {car.name}</p>
-                <p className="font-semibold text-gray-800">Delivery Address: {finalDeliveryAddress}</p>
+                <p className="font-semibold text-gray-800">Delivery Address: {purchaseFormData.name}, {finalDeliveryAddress}</p>
                 <p className="font-bold text-green-700 mt-3">Expected Delivery Window: 7-10 Business Days</p>
             </div>
 
@@ -613,7 +638,7 @@ export default function App(){
   const startPurchase = (car) => {
     setSelectedCar(car);
     setPurchaseStep(1); 
-    setPage('Inventory');
+    // Don't change the page here, let the PurchaseFlow component render over the Inventory page
   };
 
   const endPurchaseFlow = () => {
@@ -625,6 +650,7 @@ export default function App(){
 
   const renderPage = () => {
     if (purchaseStep > 0 && selectedCar) {
+      // If purchase is active, always render the PurchaseFlow component
       return (
         <PurchaseFlow 
           car={selectedCar}
@@ -637,6 +663,7 @@ export default function App(){
       );
     }
     
+    // Otherwise, render the selected page
     switch (page) {
       case 'Inventory':
         return <Inventory onPurchase={startPurchase} />; 
@@ -650,6 +677,8 @@ export default function App(){
       default:
         return (
           <main>
+            {/* Display Hero followed by Inventory on the main page */}
+            <Hero onChange={setPage} />
             <Inventory onPurchase={startPurchase} />
           </main>
         );
@@ -663,8 +692,6 @@ export default function App(){
         onChange={setPage} 
         purchaseActive={purchaseStep > 0}
       />
-      
-      {purchaseStep === 0 && <Hero onChange={setPage} />}
       
       <main className="pb-12">
         {renderPage()}
@@ -684,3 +711,4 @@ export default function App(){
     </div>
   );
 }
+
