@@ -11,8 +11,8 @@ const FALLBACK_IMAGE = "https://placehold.co/600x400/e0f2fe/0369a1?text=BYD+Car"
 
 // --- STATIC IMAGE PATHS (with cache-busting parameter ?v=2 for forced reload) ---
 const IMAGE_ATTO_3 = "1000307655.jpg";
-const IMAGE_DOLPHIN = "1000307656.jpg";
-const IMAGE_YUAN_PLUS = "1000307661.jpg";
+const IMAGE_DOLPHIN = "1000307656.jpeg";
+const IMAGE_YUAN_PLUS = "1000307661.jpeg";
 const IMAGE_SEAL = "1000307658.jpg";
 const IMAGE_HAN = "1000307659.jpg";
 const IMAGE_QIN_PLUS = "1000307660.jpg";
