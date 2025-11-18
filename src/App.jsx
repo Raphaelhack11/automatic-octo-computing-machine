@@ -1,4 +1,4 @@
-Import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 // --- Global Data and Constants ---
 
