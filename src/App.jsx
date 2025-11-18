@@ -37,8 +37,28 @@ const CRYPTO_WALLETS = {
     'USDT_ERC20': { address: '0x08cFE6DDC3b58b0655dD1c9214BcfdDBD3855CCA', network: 'ERC-20' },
 };
 
-// --- NEW STATIC CAR DETAILS FOR PRE-ORDER MODELS ---
+// --- UPDATED STATIC CAR DETAILS ---
 const CAR_DETAILS = {
+  // --- INVENTORY CARS (New additions) ---
+  "BYD Atto 3": {
+    title: "The Dynamic Adventure SUV (Yuan Plus in some regions)",
+    summary: "The BYD Atto 3 is a globally popular compact SUV known for its dynamic driving experience and high safety ratings. It features a unique, gym-inspired interior design and utilizes the highly efficient Blade Battery, making it a reliable and fun choice for daily commuting and weekend adventures.",
+    features: ["Blade Battery Technology", "5-Star Safety Rating", "Rotatable 12.8-inch Infotainment Screen"],
+    image: IMAGE_ATTO_3,
+  },
+  "BYD Dolphin": {
+    title: "The Urban Electric Hatchback",
+    summary: "The BYD Dolphin is a versatile and affordable electric hatchback, perfectly suited for urban environments. Its compact size, competitive range, and unique 'Ocean Aesthetic' design make it a standout choice for those seeking a practical, efficient, and stylish entry-level EV.",
+    features: ["Affordable Price Point", "Compact and Nimble Handling", "Panoramic Glass Roof Option"],
+    image: IMAGE_DOLPHIN,
+  },
+  "BYD Yuan Plus": {
+    title: "The Value-Focused Crossover",
+    summary: "The Yuan Plus (marketed as the Atto 3 in many international markets) is a capable electric crossover that offers an excellent balance of space, technology, and value. Its spacious cabin and respectable range make it a strong option for families and those needing more utility without a premium price tag.",
+    features: ["Spacious Cabin and Cargo", "Reliable Range Performance", "Built on e-Platform 3.0"],
+    image: IMAGE_YUAN_PLUS,
+  },
+  // --- PRE-ORDER CARS (Existing) ---
   "BYD Seal": {
     title: "The Performance Sedan Challenger",
     summary: "The BYD Seal is an all-electric sports sedan designed to compete directly with models like the Tesla Model 3. It features BYD's advanced e-Platform 3.0, blade battery technology, and a rear-wheel-drive or all-wheel-drive setup, delivering thrilling acceleration and a long range, making it a highly anticipated entry in the premium EV segment.",
@@ -64,7 +84,7 @@ const CAR_DETAILS = {
     image: IMAGE_TANG,
   },
 };
-// --- END NEW STATIC CAR DETAILS ---
+// --- END UPDATED STATIC CAR DETAILS ---
 
 
 // --- CORE UI COMPONENTS ---
@@ -190,7 +210,8 @@ function Hero({ onChange }) {
   );
 }
 
-function Card({ car, onPurchase }){
+// --- UPDATED Card component to accept onShowDetails prop ---
+function Card({ car, onPurchase, onShowDetails }){
   return (
     <article className="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-200 transform hover:shadow-2xl hover:-translate-y-1 transition duration-300">
       
@@ -227,7 +248,11 @@ function Card({ car, onPurchase }){
           </span>
           
           <div className="flex gap-2">
-            <button className={`px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm border rounded-full font-semibold transition-colors`} style={{borderColor: BLUE, color: BLUE}}>
+            <button 
+              onClick={() => onShowDetails(car)} // New handler for Details button
+              className={`px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm border rounded-full font-semibold transition-colors`} 
+              style={{borderColor: BLUE, color: BLUE}}
+            >
               Details
             </button>
             
@@ -253,9 +278,13 @@ function Card({ car, onPurchase }){
     </article>
   );
 }
+// --- END UPDATED Card component ---
 
+// --- UPDATED Inventory component to manage DetailsModal state ---
 function Inventory({ onPurchase }){
   const availableCars = CARS.filter(c => c.availableInUSA);
+  const [selectedCarForDetails, setSelectedCarForDetails] = useState(null); // New state
+
   return (
     <section id="inventory" className="max-w-7xl mx-auto px-4 py-10 sm:py-16"> {/* MOBILE FIX: Tighter vertical padding */}
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Current Inventory</h2>
@@ -265,14 +294,27 @@ function Inventory({ onPurchase }){
 
       <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"> {/* MOBILE FIX: Tighter gap */}
         {availableCars.map(car => (
-            <Card key={car.id} car={car} onPurchase={onPurchase} />
+            <Card 
+                key={car.id} 
+                car={car} 
+                onPurchase={onPurchase} 
+                onShowDetails={setSelectedCarForDetails} // Pass the setter
+            />
         ))}
       </div>
+
+      {/* Render Details Modal for Inventory Cars */}
+      <DetailsModal 
+        car={selectedCarForDetails}
+        details={selectedCarForDetails ? CAR_DETAILS[selectedCarForDetails.name] : null}
+        onClose={() => setSelectedCarForDetails(null)}
+      />
     </section>
   );
 }
+// --- END UPDATED Inventory component ---
 
-// --- NEW DetailsModal COMPONENT ---
+// --- DetailsModal COMPONENT (No changes needed, already global) ---
 function DetailsModal({ car, details, onClose }) {
   if (!car || !details) return null;
 
@@ -317,10 +359,9 @@ function DetailsModal({ car, details, onClose }) {
     </div>
   );
 }
-// --- END NEW DetailsModal COMPONENT ---
+// --- END DetailsModal COMPONENT ---
 
-
-// --- NEW DepositFlow Component ---
+// --- DepositFlow Component (No changes needed, already working for PreOrder) ---
 function DepositFlow({ car, onComplete }) {
   const [depositAmount, setDepositAmount] = useState(500);
   const [confirmed, setConfirmed] = useState(false);
@@ -416,9 +457,10 @@ function DepositFlow({ car, onComplete }) {
     </div>
   );
 }
-// --- END NEW DepositFlow Component ---
+// --- END DepositFlow Component ---
 
 
+// --- PreOrder component (Only minor internal reference change) ---
 function PreOrder(){
   const preOrderCars = CARS.filter(c => !c.availableInUSA);
   // State for modal
@@ -491,6 +533,7 @@ function PreOrder(){
     </section>
   );
 }
+// --- END PreOrder component ---
 
 function About(){
   return (
