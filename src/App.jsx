@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+Import React, { useState, useEffect, useCallback } from 'react';
 
 // --- Global Data and Constants ---
 
 const NAVY = '#0A192F';
 const BLUE = '#0077B6';
 const GRAY_ACCENT = '#4A4E69';
-const ACCENT_LIGHT = '#F0F9FF'; // Light blue for modern backgrounds
 
 // 1. Placeholder for safety if the main image fails
 const FALLBACK_IMAGE = "https://placehold.co/600x400/e0f2fe/0369a1?text=BYD+Car"; 
@@ -37,6 +36,36 @@ const CRYPTO_WALLETS = {
     'Litecoin': { address: 'ltc1qattx7q06hrjs7x8jkruyhjw7pavklwetg0j3wl', network: 'LTC' },
     'USDT_ERC20': { address: '0x08cFE6DDC3b58b0655dD1c9214BcfdDBD3855CCA', network: 'ERC-20' },
 };
+
+// --- NEW STATIC CAR DETAILS FOR PRE-ORDER MODELS ---
+const CAR_DETAILS = {
+  "BYD Seal": {
+    title: "The Performance Sedan Challenger",
+    summary: "The BYD Seal is an all-electric sports sedan designed to compete directly with models like the Tesla Model 3. It features BYD's advanced e-Platform 3.0, blade battery technology, and a rear-wheel-drive or all-wheel-drive setup, delivering thrilling acceleration and a long range, making it a highly anticipated entry in the premium EV segment.",
+    features: ["CTB (Cell-to-Body) Structure", "High-Performance AWD Option", "Sleek Aerodynamic Design"],
+    image: IMAGE_SEAL,
+  },
+  "BYD Han": {
+    title: "Luxury Flagship EV",
+    summary: "As BYD's flagship luxury sedan, the Han embodies premium design, technology, and performance. It is equipped with the revolutionary Blade Battery for maximum safety and a luxurious, spacious interior, positioning it as a strong contender in the executive EV class. It represents the pinnacle of BYD's engineering and design.",
+    features: ["Luxurious Interior Materials", "Blade Battery Technology", "Exceptional NVH isolation"],
+    image: IMAGE_HAN,
+  },
+  "BYD Qin PLUS": {
+    title: "The Accessible Hybrid/EV",
+    summary: "The Qin PLUS is a highly popular, affordable sedan, often offered in both pure EV and DM-i (Plug-in Hybrid) configurations. It focuses on efficiency, value, and practicality for the mass market. Its competitive price point and dependable performance make it an ideal choice for urban and first-time EV buyers.",
+    features: ["DM-i Super Hybrid Option", "Outstanding Fuel Efficiency", "Mass-Market Affordability"],
+    image: IMAGE_QIN_PLUS,
+  },
+  "BYD Tang": {
+    title: "Premium 7-Seater SUV",
+    summary: "The Tang is BYD's large, premium SUV, available as an all-electric or plug-in hybrid (DM-p/i) 7-seater. It offers substantial power, a comfortable family-focused interior, and a sleek, modern exterior design overseen by a global design team. It's built for those needing space, luxury, and all-electric capability.",
+    features: ["7-Seater Configuration", "High Safety Rating", "Powerful Electric Motors"],
+    image: IMAGE_TANG,
+  },
+};
+// --- END NEW STATIC CAR DETAILS ---
+
 
 // --- CORE UI COMPONENTS ---
 
@@ -243,8 +272,159 @@ function Inventory({ onPurchase }){
   );
 }
 
+// --- NEW DetailsModal COMPONENT ---
+function DetailsModal({ car, details, onClose }) {
+  if (!car || !details) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full transform transition-all duration-300">
+        <div className="relative">
+          <img 
+            src={details.image} 
+            alt={car.name} 
+            className="w-full h-48 object-cover rounded-t-xl"
+            onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
+          />
+          <button 
+            onClick={onClose}
+            className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-lg text-gray-800 hover:bg-gray-100 transition"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div className="p-6">
+          <h3 className="text-2xl font-bold text-gray-900" style={{color: BLUE}}>{car.name} Details: {details.title}</h3>
+          <p className="text-sm text-gray-600 mt-2">Est. Price: <span className="font-semibold">{car.price}</span> | Range: <span className="font-semibold">{car.range}</span></p>
+
+          <p className="mt-4 text-gray-700 leading-relaxed text-base">{details.summary}</p>
+
+          <div className="mt-5">
+            <h4 className="font-bold text-lg mb-2 text-gray-800">Key Features:</h4>
+            <ul className="list-disc list-inside text-gray-600 text-sm grid grid-cols-2 gap-y-1">
+              {details.features.map((f, i) => <li key={i}>{f}</li>)}
+            </ul>
+          </div>
+
+          <div className="mt-6 flex justify-end">
+            <button onClick={onClose} className={`px-4 py-2 rounded-full text-white font-semibold transition`} style={{backgroundColor: NAVY}}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+// --- END NEW DetailsModal COMPONENT ---
+
+
+// --- NEW DepositFlow Component ---
+function DepositFlow({ car, onComplete }) {
+  const [depositAmount, setDepositAmount] = useState(500);
+  const [confirmed, setConfirmed] = useState(false);
+  const btcWallet = CRYPTO_WALLETS['Bitcoin'];
+
+  const handleDepositChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (value >= 500 && value <= 10000) {
+      setDepositAmount(value);
+    } else if (e.target.value === '') {
+      setDepositAmount('');
+    }
+  };
+
+  const handleConfirm = () => {
+    if (depositAmount >= 500 && depositAmount <= 10000) {
+      setConfirmed(true);
+      // In a real app, this would initiate a timer for payment confirmation
+    }
+  };
+  
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full transform transition-all duration-300 border-t-8 border-blue-600 p-6 sm:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 border-b pb-2" style={{color: BLUE}}>
+                Pre-Order Deposit: {car.name}
+            </h2>
+            
+            {!confirmed ? (
+                <>
+                    <p className="text-base text-gray-700 mb-6">
+                        Secure your **{car.name}** with a fully refundable deposit. Enter an amount between **$500** and **$10,000** below.
+                    </p>
+
+                    <div className="mb-6">
+                        <label htmlFor="deposit" className="block text-sm font-medium text-gray-700 mb-2">Deposit Amount ($)</label>
+                        <input
+                            id="deposit"
+                            type="number"
+                            value={depositAmount}
+                            onChange={handleDepositChange}
+                            min="500"
+                            max="10000"
+                            step="100"
+                            required
+                            className="w-full p-3 border-2 border-gray-300 rounded-lg text-lg font-bold text-center focus:border-blue-500 focus:ring-blue-500"
+                        />
+                        <p className={`mt-2 text-xs ${depositAmount >= 500 && depositAmount <= 10000 ? 'text-green-600' : 'text-red-600'}`}>
+                            Current Deposit: ${depositAmount}
+                        </p>
+                    </div>
+
+                    <div className="flex justify-between gap-3">
+                        <button onClick={onComplete} className="flex-1 py-2 rounded-full border text-sm font-semibold transition-colors" style={{borderColor: NAVY, color: NAVY}}>
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleConfirm} 
+                            disabled={!(depositAmount >= 500 && depositAmount <= 10000)}
+                            className={`flex-1 py-2 rounded-full text-white text-sm font-semibold transition-colors ${depositAmount >= 500 && depositAmount <= 10000 ? '' : 'opacity-50 cursor-not-allowed'}`} 
+                            style={{backgroundColor: BLUE}}>
+                            Confirm Deposit Amount
+                        </button>
+                    </div>
+                </>
+            ) : (
+                <div className="text-center">
+                    <h3 className="font-bold text-xl sm:text-2xl mb-4" style={{color: BLUE}}>Send Deposit Payment</h3>
+                    <p className="text-sm sm:text-lg text-gray-700 mb-4">
+                        Send exactly **${depositAmount}** to the following **Bitcoin** address:
+                    </p>
+                    
+                    <div className="mt-4 p-4 sm:p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
+                        <p className="font-mono text-xs sm:text-base break-all text-gray-800">{btcWallet.address}</p>
+                        <div className="flex justify-center mt-3">
+                            <CopyToClipboard text={btcWallet.address} />
+                        </div>
+                    </div>
+                    
+                    <p className="text-xs sm:text-sm text-gray-500 mt-2">Network: {btcWallet.network} (BTC)</p>
+
+                    <div className="mt-8 flex justify-between gap-3">
+                        <button onClick={onComplete} className="flex-1 py-2 rounded-full border text-sm font-semibold transition-colors" style={{borderColor: NAVY, color: NAVY}}>
+                            Payment Sent (Simulated)
+                        </button>
+                        <button onClick={() => setConfirmed(false)} className={`flex-1 py-2 rounded-full text-white text-sm font-semibold transition-colors`} style={{backgroundColor: GRAY_ACCENT}}>
+                            Change Amount
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    </div>
+  );
+}
+// --- END NEW DepositFlow Component ---
+
+
 function PreOrder(){
   const preOrderCars = CARS.filter(c => !c.availableInUSA);
+  // State for modal
+  const [selectedCarForDetails, setSelectedCarForDetails] = useState(null);
+  const [selectedCarForDeposit, setSelectedCarForDeposit] = useState(null);
+
   return (
     <section id="preorder" className="max-w-7xl mx-auto px-4 py-10 sm:py-16 bg-gray-100 rounded-2xl my-6 shadow-inner border border-gray-200">
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Upcoming Models & Pre-Orders</h2>
@@ -267,10 +447,18 @@ function PreOrder(){
               <h3 className="font-bold text-lg sm:text-xl text-gray-900">{car.name}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Expected Range: {car.range} • Est. Price: {car.price}</p>
               <div className="mt-4 flex gap-3">
-                <button className={`flex-1 py-2 rounded-full border text-sm font-semibold transition-colors`} style={{borderColor: BLUE, color: BLUE}}>
+                <button 
+                  onClick={() => setSelectedCarForDeposit(car)} // Open Deposit Flow
+                  className={`flex-1 py-2 rounded-full border text-sm font-semibold transition-colors`} 
+                  style={{borderColor: BLUE, color: BLUE}}
+                >
                   Place Deposit
                 </button>
-                <button className={`flex-1 py-2 rounded-full text-white text-sm font-semibold transition-colors`} style={{backgroundColor: BLUE}}>
+                <button 
+                  onClick={() => setSelectedCarForDetails(car)} // Open Details Modal
+                  className={`flex-1 py-2 rounded-full text-white text-sm font-semibold transition-colors`} 
+                  style={{backgroundColor: BLUE}}
+                >
                   Full Details
                 </button>
               </div>
@@ -285,6 +473,21 @@ function PreOrder(){
           All deposits are fully refundable until the final purchase agreement is signed. Secure your spot risk-free.
         </p>
       </div>
+
+      {/* Render Details Modal */}
+      <DetailsModal 
+        car={selectedCarForDetails}
+        details={selectedCarForDetails ? CAR_DETAILS[selectedCarForDetails.name] : null}
+        onClose={() => setSelectedCarForDetails(null)}
+      />
+      
+      {/* Render Deposit Flow */}
+      {selectedCarForDeposit && (
+        <DepositFlow 
+          car={selectedCarForDeposit}
+          onComplete={() => setSelectedCarForDeposit(null)}
+        />
+      )}
     </section>
   );
 }
@@ -416,37 +619,6 @@ function Contact(){
 }
 
 
-// --- NEW COMPONENT: Stepper (Progress Bar) ---
-
-function Stepper({ current, total }) {
-    const progressWidth = `${(current / total) * 100}%`;
-    const steps = Array.from({ length: total }, (_, i) => i + 1);
-
-    return (
-        <div className="mb-8 w-full">
-            <div className="flex justify-between relative mb-2">
-                {steps.map((step) => (
-                    <div 
-                        key={step} 
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-10 
-                            ${step <= current ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-200 text-gray-500 border border-gray-300'}`
-                        }
-                    >
-                        {step}
-                    </div>
-                ))}
-            </div>
-            <div className="relative w-full h-1 bg-gray-200 rounded-full mt-[-30px]"> 
-                <div 
-                    className="absolute h-full bg-blue-600 rounded-full transition-all duration-500 ease-out" 
-                    style={{ width: progressWidth }}
-                ></div>
-            </div>
-        </div>
-    );
-}
-
-
 // --- NEW PURCHASE FLOW COMPONENT (10 Steps) ---
 
 function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormData, onComplete }) {
@@ -460,10 +632,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
 
   const handleSubmitStep1 = (e) => {
     e.preventDefault();
-    // Only proceed if form is valid (required fields are filled)
-    if (e.currentTarget.checkValidity()) {
-        setFlowStep(2); 
-    }
+    setFlowStep(2); 
   };
   
   const handleCryptoSelect = (e) => {
@@ -484,7 +653,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
     }, [timeLeft, nextStep, setFlowStep]);
 
     return (
-      <div className="text-center p-8">
+      <div className="text-center p-6 sm:p-8">
         <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-4 mx-auto" style={{borderColor: BLUE}}></div>
         <h3 className="text-xl sm:text-2xl font-semibold mt-4 sm:mt-6 text-gray-900">
           {flowStep === 5 ? 'Verifying Application Fee Payment...' : 'Verifying Final Payment...'}
@@ -503,31 +672,13 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 1: 
         return (
           <form onSubmit={handleSubmitStep1} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <h4 className="col-span-full font-bold text-xl mb-2 text-gray-800">1. Personal & Delivery Details</h4>
-            
-            {/* Row 1: Name & Email */}
-            <input required name="name" placeholder="Full Name *" value={purchaseFormData.name || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
-            <input required name="email" type="email" placeholder="Email *" value={purchaseFormData.email || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
-            
-            {/* Row 2: Phone & Gender */}
-            <input required name="phone" placeholder="Phone *" pattern="[0-9]{10,}" title="Phone number must be at least 10 digits." value={purchaseFormData.phone || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
-            <select required name="gender" value={purchaseFormData.gender || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white appearance-none text-gray-700 text-sm">
-                <option value="" disabled>Select Gender *</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Non-Binary">Non-Binary</option>
-                <option value="Prefer Not To Say">Prefer Not To Say</option>
-            </select>
-
-            {/* Row 3: Address (Full Width) */}
-            <input required name="address" placeholder="Street Address (for delivery) *" value={purchaseFormData.address || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm col-span-full" />
-            
-            {/* Row 4: Country & State */}
-            <input required name="country" placeholder="Country *" value={purchaseFormData.country || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
-            <input required name="state" placeholder="State/Province *" value={purchaseFormData.state || ''} onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
-
-            <div className="col-span-full flex justify-end mt-4">
-              <button type="submit" className={`px-6 py-2 text-white rounded-full font-semibold transition text-base shadow-lg`} style={{backgroundColor: BLUE}}>
+            <h4 className="col-span-full font-bold text-xl mb-2" style={{color: BLUE}}>1. Customer Details</h4>
+            <input required name="name" placeholder="Full Name *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input required name="email" type="email" placeholder="Email *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input required name="phone" placeholder="Phone *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input required name="address" placeholder="Street Address (for delivery) *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <div className="col-span-full flex justify-end">
+              <button type="submit" className={`px-4 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
                 Proceed to Fee Payment &rarr;
               </button>
             </div>
@@ -537,13 +688,13 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 2: 
         return (
           <div className="text-center p-4 sm:p-6">
-            <h4 className="font-bold text-xl sm:text-2xl mb-4 text-gray-800">2. Application Fee Required</h4>
+            <h4 className="font-bold text-xl sm:text-2xl mb-4" style={{color: BLUE}}>2. Application Fee Required</h4>
             <div className="inline-block p-4 border-b-4 border-gray-200 mb-6">
                 <p className="text-lg sm:text-xl text-gray-700">A refundable application fee is required to reserve the vehicle.</p>
                 <p className="text-4xl sm:text-5xl font-extrabold mt-3" style={{color: NAVY}}>${depositAmount.toFixed(2)}</p>
             </div>
             
-            <button onClick={() => setFlowStep(3)} className={`mt-6 px-8 py-3 text-white rounded-full font-semibold text-lg shadow-lg transition`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(3)} className={`mt-6 px-6 py-3 text-white rounded-full font-semibold text-lg shadow-lg transition`} style={{backgroundColor: BLUE}}>
                 Select Payment Method &rarr;
             </button>
           </div>
@@ -552,10 +703,10 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 3: 
         return (
           <div className="text-center p-4 sm:p-6">
-            <h4 className="font-bold text-xl mb-4 text-gray-800">3. Select Crypto Payment Method</h4>
+            <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>3. Select Crypto Payment Method</h4>
             <p className="text-sm sm:text-base text-gray-600 mb-6">Select a network to display the corresponding wallet address for the **${depositAmount.toFixed(2)}** fee.</p>
 
-            <select onChange={(e) => { handleCryptoSelect(e); setFlowStep(4); }} value={selectedCrypto} className="w-full max-w-md mx-auto p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium text-sm">
+            <select onChange={(e) => { handleCryptoSelect(e); setFlowStep(4); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium text-sm">
                 <option value="" disabled>-- Choose Cryptocurrency --</option>
                 {Object.keys(CRYPTO_WALLETS).map(key => (
                     <option key={key} value={key}>{key}</option>
@@ -567,7 +718,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 4: 
         return (
           <div className="text-center p-4 sm:p-6">
-            <h4 className="font-bold text-xl mb-4 text-gray-800">4. Send Application Fee Payment</h4>
+            <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>4. Send Application Fee Payment</h4>
             <p className="text-sm sm:text-lg text-gray-700 mb-4">Send exactly **${depositAmount.toFixed(2)}** to the following {selectedCrypto} address:</p>
             
             <div className="mt-4 p-4 sm:p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
@@ -579,7 +730,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
             
             <p className="text-xs sm:text-sm text-gray-500 mt-2">Network: {walletInfo.network}</p>
             
-            <button onClick={() => setFlowStep(5)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition text-base shadow-lg`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(5)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
               I Have Sent the Payment &rarr;
             </button>
           </div>
@@ -589,7 +740,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
         return <LoadingStep nextStep={6} />;
 
       case 6: 
-        const deliveryAddress = `${purchaseFormData.address}, ${purchaseFormData.state}, ${purchaseFormData.country}`;
+        const deliveryAddress = `${purchaseFormData.address}`;
         return (
           <div className="text-center p-4 sm:p-6">
             <h4 className="font-bold text-xl sm:text-2xl mb-4 text-green-600">6. Application Approved!</h4>
@@ -601,7 +752,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
                 <p className="font-semibold text-gray-800 mt-3">Delivery Location: <span className="text-green-700 font-medium">{deliveryAddress}</span></p>
             </div>
 
-            <button onClick={() => setFlowStep(7)} className={`mt-6 px-6 py-2 text-white rounded-full font-semibold transition text-base shadow-lg`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(7)} className={`mt-6 px-6 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
               Confirm & Proceed to Final Car Payment &rarr;
             </button>
           </div>
@@ -610,11 +761,11 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 7: 
         return (
           <div className="text-center p-4 sm:p-6">
-            <h4 className="font-bold text-xl mb-4 text-gray-800">7. Select Final Car Payment Method</h4>
+            <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>7. Select Final Car Payment Method</h4>
             <p className="text-lg text-gray-700">Final Price: <span className="font-extrabold text-3xl" style={{color: NAVY}}>{car.price}</span></p>
             <p className="text-sm sm:text-base text-gray-600 mt-2 mb-6">Select a network to display the corresponding wallet address for the final payment.</p>
 
-            <select onChange={(e) => { setSelectedCrypto(e.target.value); setFlowStep(8); }} value={selectedCrypto} className="w-full max-w-md mx-auto p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium text-sm">
+            <select onChange={(e) => { setSelectedCrypto(e.target.value); setFlowStep(8); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium text-sm">
                 <option value="" disabled>-- Choose Cryptocurrency --</option>
                 {Object.keys(CRYPTO_WALLETS).map(key => (
                     <option key={key} value={key}>{key}</option>
@@ -626,7 +777,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 8: 
         return (
           <div className="text-center p-4 sm:p-6">
-            <h4 className="font-bold text-xl mb-4 text-gray-800">8. Send Final Payment</h4>
+            <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>8. Send Final Payment</h4>
             <p className="text-sm sm:text-lg text-gray-700 mb-4">Send exactly **{car.price}** to the following {selectedCrypto} address:</p>
             
             <div className="mt-4 p-4 sm:p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
@@ -638,7 +789,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
             
             <p className="text-xs sm:text-sm text-gray-500 mt-2">Network: {walletInfo.network}</p>
 
-            <button onClick={() => setFlowStep(9)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition text-base shadow-lg`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(9)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
               I Have Sent the Final Payment &rarr;
             </button>
           </div>
@@ -648,7 +799,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
         return <LoadingStep nextStep={10} />;
 
       case 10: 
-        const finalDeliveryAddress = `${purchaseFormData.address}, ${purchaseFormData.state}, ${purchaseFormData.country}`;
+        const finalDeliveryAddress = `${purchaseFormData.address}`;
         return (
           <div className="text-center p-4 sm:p-6">
             <h4 className="font-bold text-xl sm:text-2xl mb-4 text-green-600">10. Purchase Complete! 🎉</h4>
@@ -656,8 +807,7 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
             
             <div className="mt-6 p-4 sm:p-5 bg-green-50 rounded-xl border border-green-300 text-left mx-auto max-w-lg shadow-md text-sm">
                 <p className="font-semibold text-gray-800">Car: {car.name}</p>
-                <p className="font-semibold text-gray-800">Recipient: {purchaseFormData.name}</p>
-                <p className="font-semibold text-gray-800">Delivery Location: {finalDeliveryAddress}</p>
+                <p className="font-semibold text-gray-800">Delivery Address: {purchaseFormData.name}, {finalDeliveryAddress}</p>
                 <p className="font-bold text-green-700 mt-3">Expected Delivery Window: 7-10 Business Days</p>
             </div>
 
@@ -675,17 +825,16 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
   return (
     // MOBILE FIX: Tighter horizontal padding on the main container
     <div className="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-16"> 
-        <div className="bg-white rounded-xl shadow-2xl p-4 sm:p-8 border-t-8 border-blue-600" style={{backgroundColor: ACCENT_LIGHT}}>
-            <div className="flex justify-between items-center mb-6 pb-2">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                    <span style={{color: BLUE}}>{car.name}</span>
+        <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-10 border-t-8 border-blue-600"> {/* MOBILE FIX: Tighter interior padding */}
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900"> {/* MOBILE FIX: Smaller font size */}
+                    <span style={{color: BLUE}}>Purchase Flow:</span> {car.name}
                 </h2>
-                {/* Replaced 'Step X/10' with a visual progress bar */}
+                <span className={`text-base sm:text-xl font-bold ${flowStep >= totalSteps ? 'text-green-600' : 'text-blue-600'}`}> {/* MOBILE FIX: Smaller font size */}
+                    Step {flowStep} / {totalSteps}
+                </span>
             </div>
             
-            {/* New Stepper component added here */}
-            <Stepper current={flowStep} total={totalSteps} />
-
             {renderStepContent()}
         </div>
     </div>
@@ -704,6 +853,7 @@ export default function App(){
   const startPurchase = (car) => {
     setSelectedCar(car);
     setPurchaseStep(1); 
+    // Don't change the page here, let the PurchaseFlow component render over the Inventory page
   };
 
   const endPurchaseFlow = () => {
@@ -741,7 +891,7 @@ export default function App(){
       case 'Home':
       default:
         return (
-          <main className="flex-grow"> {/* Added flex-grow */}
+          <main>
             {/* Display Hero followed by Inventory on the main page */}
             <Hero onChange={setPage} />
             <Inventory onPurchase={startPurchase} />
@@ -751,26 +901,19 @@ export default function App(){
   };
 
   return (
-    // FOOTER FIX: Use flex-col and min-h-screen on the outer div 
-    // and flex-grow on the main element to push the footer down.
-    <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
+    <div className="min-h-screen bg-gray-50 font-sans">
       <Nav 
         current={page} 
         onChange={setPage} 
         purchaseActive={purchaseStep > 0}
       />
       
-      {/* If not on the main Home/Inventory combo, render only the current page */}
-      <main className="pb-8 sm:pb-12 flex-grow">
-        {page === 'Home' ? renderPage() : (
-            <div className="flex-grow">
-                {renderPage()}
-            </div>
-        )}
+      <main className="pb-8 sm:pb-12"> {/* MOBILE FIX: Tighter bottom padding */}
+        {renderPage()}
       </main>
 
-      <footer className="border-t text-white mt-auto" style={{backgroundColor: NAVY}}>
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+      <footer className="border-t mt-8 sm:mt-12 text-white" style={{backgroundColor: NAVY}}> {/* MOBILE FIX: Tighter top margin */}
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4"> {/* MOBILE FIX: Tighter padding and gap */}
           <div className="text-xs sm:text-sm text-gray-400">
             © {new Date().getFullYear()} BYD Motor Hubs. All rights reserved.
           </div>
