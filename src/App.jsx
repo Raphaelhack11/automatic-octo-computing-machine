@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+Import React, { useState, useEffect, useCallback } from 'react';
 
 // --- Global Data and Constants ---
 
@@ -73,20 +73,24 @@ function Nav({ current, onChange, purchaseActive }) {
 
   return (
     <nav className={`sticky top-0 z-20 shadow-lg`} style={{backgroundColor: NAVY}}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* MOBILE FIX: Use px-2 for tighter mobile padding */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8"> 
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center gap-2">
-            <div className="text-white font-extrabold text-2xl tracking-wide">BYD HUBS</div>
-            <span className="hidden sm:inline text-xs text-gray-400 border-l border-gray-600 pl-2">Official Dealer</span>
+            {/* MOBILE FIX: Smaller font size for logo on tiny screens */}
+            <div className="text-white font-extrabold text-xl sm:text-2xl tracking-wide">BYD HUBS</div> 
+            {/* MOBILE FIX: Hide "Official Dealer" on very small screens */}
+            <span className="hidden md:inline text-xs text-gray-400 border-l border-gray-600 pl-2">Official Dealer</span>
           </div>
 
-          <div className="flex overflow-x-auto whitespace-nowrap -mx-2 sm:mx-0 p-2 sm:p-0">
+          {/* This is already mobile-friendly with overflow-x-auto, but use -mx-1 for tighter button spacing */}
+          <div className="flex overflow-x-auto whitespace-nowrap -mx-1 sm:mx-0 p-2 sm:p-0">
             {pages.map((p) => (
               <button
                 key={p}
                 onClick={() => !purchaseActive && onChange(p)}
                 disabled={purchaseActive}
-                className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 mx-1
+                className={`flex-shrink-0 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 mx-1
                   ${current === p 
                     ? `text-white bg-blue-700 shadow-md` 
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'}
@@ -106,27 +110,32 @@ function Hero({ onChange }) {
   // Using the Atto 3 image as the main Hero image
   const HERO_IMAGE = IMAGE_ATTO_3; 
   return (
-    <header className={`py-16`} style={{backgroundColor: NAVY}}>
+    // MOBILE FIX: Reduce top/bottom padding
+    <header className={`py-10 md:py-16`} style={{backgroundColor: NAVY}}> 
+      {/* MOBILE FIX: Use tighter horizontal padding */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col-reverse md:flex-row items-center gap-8">
         
         <div className="flex-1 text-center md:text-left">
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-snug">
+          {/* MOBILE FIX: Reduce font size */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-snug"> 
             Drive Your Electric Future with <span style={{color: BLUE}}>BYD</span>
           </h1>
-          <p className="mt-4 text-lg text-gray-300 max-w-xl mx-auto md:mx-0">
+          {/* MOBILE FIX: Reduce font size */}
+          <p className="mt-4 text-base sm:text-lg text-gray-300 max-w-xl mx-auto md:mx-0"> 
             Explore BYD's full lineup of innovative, high-quality electric vehicles.
           </p>
-          <div className="mt-8 flex justify-center md:justify-start gap-4">
+          {/* MOBILE FIX: Stack buttons vertically on mobile (flex-col) and make them full width (w-full) */}
+          <div className="mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-3 sm:gap-4">
             <button 
                 onClick={() => onChange('Inventory')}
-                className={`inline-flex items-center px-8 py-3 rounded-xl text-base font-semibold shadow-xl transition-colors`}
+                className={`w-full sm:w-auto inline-flex items-center px-6 py-3 rounded-xl text-base font-semibold shadow-xl transition-colors`}
                 style={{backgroundColor: BLUE, color: 'white'}}
                 >
               View Inventory
             </button>
             <button 
                 onClick={() => onChange('Pre-Order')}
-                className={`inline-flex items-center px-8 py-3 border-2 rounded-xl text-base font-semibold transition-colors`}
+                className={`w-full sm:w-auto inline-flex items-center px-6 py-3 border-2 rounded-xl text-base font-semibold transition-colors`}
                 style={{borderColor: BLUE, color: BLUE}}
                 >
               Reserve a Model
@@ -134,12 +143,12 @@ function Hero({ onChange }) {
           </div>
         </div>
 
+        {/* Ensure the image container doesn't take up too much width on mobile */}
         <div className="w-full md:w-1/2 p-4 bg-gray-900 rounded-2xl shadow-2xl">
-          {/* Uses the unique image path for the Hero car */}
           <img 
             src={HERO_IMAGE} 
             alt="BYD Car Showcase" 
-            className="w-full h-56 object-cover rounded-xl" 
+            className="w-full h-48 sm:h-56 object-cover rounded-xl" // MOBILE FIX: Slightly smaller height
             onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
           />
           <div className="mt-4 text-xs text-gray-500 text-center">
@@ -155,7 +164,7 @@ function Card({ car, onPurchase }){
   return (
     <article className="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-200 transform hover:shadow-2xl hover:-translate-y-1 transition duration-300">
       
-      <div className="h-44 flex items-center justify-center relative">
+      <div className="h-40 sm:h-44 flex items-center justify-center relative"> {/* MOBILE FIX: Slightly smaller height */}
         <img 
           // Uses car.img which is set in the global CARS array (with cache buster)
           src={car.img} 
@@ -168,8 +177,8 @@ function Card({ car, onPurchase }){
         </div>
       </div>
 
-      <div className="p-5">
-        <h3 className="text-2xl font-bold text-gray-900">{car.name}</h3>
+      <div className="p-4 sm:p-5"> {/* MOBILE FIX: Reduce padding */}
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{car.name}</h3> {/* MOBILE FIX: Reduce font size */}
         <p className="text-sm text-gray-600 mt-2">
           Range: <span className="font-semibold text-gray-800">{car.range}</span>
         </p>
@@ -179,7 +188,7 @@ function Card({ car, onPurchase }){
         
         <div className="mt-4 flex items-center justify-between pt-3 border-t border-gray-100">
           <span 
-            className={`text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider 
+            className={`text-xs font-semibold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider 
               ${car.availableInUSA 
                 ? 'bg-green-100 text-green-700' 
                 : 'bg-yellow-100 text-yellow-800'}`
@@ -188,21 +197,21 @@ function Card({ car, onPurchase }){
           </span>
           
           <div className="flex gap-2">
-            <button className={`px-4 py-1.5 text-sm border rounded-full font-semibold transition-colors`} style={{borderColor: BLUE, color: BLUE}}>
+            <button className={`px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm border rounded-full font-semibold transition-colors`} style={{borderColor: BLUE, color: BLUE}}>
               Details
             </button>
             
             {car.availableInUSA ? (
                 <button 
                   onClick={() => onPurchase(car)}
-                  className={`px-4 py-1.5 text-sm rounded-full text-white font-semibold transition-colors`}
+                  className={`px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm rounded-full text-white font-semibold transition-colors`}
                   style={{backgroundColor: BLUE}}
                   >
                   Purchase
                 </button>
             ) : (
                 <button 
-                  className={`px-4 py-1.5 text-sm rounded-full text-white font-semibold transition-colors`}
+                  className={`px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm rounded-full text-white font-semibold transition-colors`}
                   style={{backgroundColor: GRAY_ACCENT}}
                   >
                   Contact
@@ -218,13 +227,13 @@ function Card({ car, onPurchase }){
 function Inventory({ onPurchase }){
   const availableCars = CARS.filter(c => c.availableInUSA);
   return (
-    <section id="inventory" className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
-      <h2 className="text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Current Inventory</h2>
-      <p className="text-gray-600 mt-3 max-w-2xl">
+    <section id="inventory" className="max-w-7xl mx-auto px-4 py-10 sm:py-16"> {/* MOBILE FIX: Tighter vertical padding */}
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Current Inventory</h2>
+      <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-2xl"> {/* MOBILE FIX: Smaller font size */}
         The models below are currently available in the U.S. and ready for immediate delivery.
       </p>
 
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"> {/* MOBILE FIX: Tighter gap */}
         {availableCars.map(car => (
             <Card key={car.id} car={car} onPurchase={onPurchase} />
         ))}
@@ -236,16 +245,16 @@ function Inventory({ onPurchase }){
 function PreOrder(){
   const preOrderCars = CARS.filter(c => !c.availableInUSA);
   return (
-    <section id="preorder" className="max-w-7xl mx-auto px-4 py-12 sm:py-16 bg-gray-100 rounded-2xl my-6 shadow-inner border border-gray-200">
-      <h2 className="text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Upcoming Models & Pre-Orders</h2>
-      <p className="text-gray-600 mt-3 max-w-2xl">
+    <section id="preorder" className="max-w-7xl mx-auto px-4 py-10 sm:py-16 bg-gray-100 rounded-2xl my-6 shadow-inner border border-gray-200">
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Upcoming Models & Pre-Orders</h2>
+      <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-2xl">
         Secure your place in line for future models not yet available in the U.S. market.
       </p>
 
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {preOrderCars.map(car => (
-          <article key={car.id} className="bg-white rounded-xl shadow-lg border p-5 transition-transform hover:scale-[1.02] duration-300">
-            <div className="h-40 bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
+          <article key={car.id} className="bg-white rounded-xl shadow-lg border p-4 sm:p-5 transition-transform hover:scale-[1.02] duration-300">
+            <div className="h-32 sm:h-40 bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
               <img 
                 src={car.img} 
                 alt={car.name} 
@@ -254,8 +263,8 @@ function PreOrder(){
               />
             </div>
             <div className="mt-4">
-              <h3 className="font-bold text-xl text-gray-900">{car.name}</h3>
-              <p className="text-sm text-gray-500 mt-1">Expected Range: {car.range} • Est. Price: {car.price}</p>
+              <h3 className="font-bold text-lg sm:text-xl text-gray-900">{car.name}</h3>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">Expected Range: {car.range} • Est. Price: {car.price}</p>
               <div className="mt-4 flex gap-3">
                 <button className={`flex-1 py-2 rounded-full border text-sm font-semibold transition-colors`} style={{borderColor: BLUE, color: BLUE}}>
                   Place Deposit
@@ -269,7 +278,7 @@ function PreOrder(){
         ))}
       </div>
 
-      <div className="mt-12 p-6 rounded-lg border-l-4 shadow-md" style={{backgroundColor: 'white', borderColor: BLUE}}>
+      <div className="mt-10 sm:mt-12 p-4 sm:p-6 rounded-lg border-l-4 shadow-md" style={{backgroundColor: 'white', borderColor: BLUE}}>
         <h4 className="font-bold text-lg text-gray-800">Reservation Guarantee</h4>
         <p className="text-gray-600 mt-2 text-sm">
           All deposits are fully refundable until the final purchase agreement is signed. Secure your spot risk-free.
@@ -281,23 +290,23 @@ function PreOrder(){
 
 function About(){
   return (
-    <section className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
-      <h2 className="text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Our Commitment to Electrification</h2>
-      <p className="text-gray-600 mt-3 max-w-2xl">
+    <section className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Our Commitment to Electrification</h2>
+      <p className="text-sm sm:text-base text-gray-600 mt-3 max-w-2xl">
         BYD Motor Hubs is an authorized partner bringing BYD's innovative and affordable electric vehicle line to local drivers, focusing on quality service and sustainable transport.
       </p>
 
-      <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {/* Mission Card */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+        <div className="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
           <h3 className="font-bold text-xl" style={{color: BLUE}}>Our Mission</h3>
-          <p className="text-gray-700 mt-3">To make cutting-edge, affordable electric vehicles accessible to everyone, backed by trusted local service and support.</p>
+          <p className="text-gray-700 mt-3 text-sm">To make cutting-edge, affordable electric vehicles accessible to everyone, backed by trusted local service and support.</p>
         </div>
         
         {/* Location Card */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+        <div className="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
           <h3 className="font-bold text-xl" style={{color: BLUE}}>Visit Us</h3>
-          <address className="not-italic text-gray-700 mt-3">
+          <address className="not-italic text-gray-700 mt-3 text-sm">
             <strong>BYD Motor Hubs Main Office</strong><br />
             123 Electric Avenue, Suite 100<br />
             Charge City, CA 90210
@@ -305,9 +314,9 @@ function About(){
         </div>
         
         {/* Hours Card */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+        <div className="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
           <h3 className="font-bold text-xl" style={{color: BLUE}}>Hours of Operation</h3>
-          <p className="text-gray-700 mt-3">
+          <p className="text-gray-700 mt-3 text-sm">
             Monday - Friday: 9:00 AM – 7:00 PM<br />
             Saturday: 10:00 AM – 5:00 PM<br />
             Sunday: Closed
@@ -331,10 +340,10 @@ function Contact(){
   };
   
   return (
-    <section id="contact" className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
+    <section id="contact" className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-10">
-        <h2 className="text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Get in Touch</h2>
-        <p className="text-gray-600 mt-3">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b-4 inline-block pb-2" style={{borderColor: BLUE}}>Get in Touch</h2>
+        <p className="text-gray-600 mt-3 text-sm sm:text-base">
           Book a test drive or ask any questions about BYD's electric lineup.
         </p>
 
@@ -344,14 +353,15 @@ function Contact(){
             </div>
         )}
 
-        <form className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+        {/* The grid layout is inherently mobile-friendly as it collapses to one column by default */}
+        <form className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6" onSubmit={handleSubmit}>
           
           <input 
             required 
             name="name" 
             placeholder="Full name" 
             onChange={() => {}}
-            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm" 
           />
           <input 
             required 
@@ -359,19 +369,19 @@ function Contact(){
             type="email" 
             placeholder="Email address" 
             onChange={() => {}}
-            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm" 
           />
           <input 
             name="phone" 
             placeholder="Phone number (optional)" 
             onChange={() => {}}
-            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" 
+            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm" 
           />
           <select 
             required
             name="interest" 
             onChange={() => {}}
-            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white appearance-none text-gray-700"
+            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white appearance-none text-gray-700 text-sm"
           >
             <option value="" disabled defaultValue>Select Inquiry Type *</option>
             <option>Schedule a Test Drive</option>
@@ -384,14 +394,14 @@ function Contact(){
             name="message" 
             placeholder="Your detailed message..." 
             onChange={() => {}}
-            className="p-3 border border-gray-300 rounded-lg col-span-1 sm:col-span-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-            rows={5}
+            className="p-3 border border-gray-300 rounded-lg col-span-1 sm:col-span-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm" 
+            rows={4} // MOBILE FIX: Smaller default rows
           ></textarea>
           
           <div className="col-span-1 sm:col-span-2 flex justify-end">
             <button 
               type="submit" 
-              className={`px-8 py-3 text-white rounded-full font-semibold text-lg shadow-xl transition-all duration-300`}
+              className={`px-6 py-2 text-white rounded-full font-semibold text-base sm:text-lg shadow-xl transition-all duration-300`} // MOBILE FIX: Slightly smaller button on mobile
               style={{backgroundColor: BLUE}}
               disabled={isSubmitted}
             >
@@ -439,12 +449,12 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
     }, [timeLeft, nextStep, setFlowStep]);
 
     return (
-      <div className="text-center p-8">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 mx-auto" style={{borderColor: BLUE}}></div>
-        <h3 className="text-2xl font-semibold mt-6 text-gray-900">
+      <div className="text-center p-6 sm:p-8">
+        <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-4 mx-auto" style={{borderColor: BLUE}}></div>
+        <h3 className="text-xl sm:text-2xl font-semibold mt-4 sm:mt-6 text-gray-900">
           {flowStep === 5 ? 'Verifying Application Fee Payment...' : 'Verifying Final Payment...'}
         </h3>
-        <p className="text-gray-600 mt-2">
+        <p className="text-sm sm:text-base text-gray-600 mt-2">
           Please wait while we confirm the simulated transaction (T-{timeLeft}).
         </p>
       </div>
@@ -457,14 +467,14 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
     switch (flowStep) {
       case 1: 
         return (
-          <form onSubmit={handleSubmitStep1} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmitStep1} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <h4 className="col-span-full font-bold text-xl mb-2" style={{color: BLUE}}>1. Customer Details</h4>
-            <input required name="name" placeholder="Full Name *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500" />
-            <input required name="email" type="email" placeholder="Email *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500" />
-            <input required name="phone" placeholder="Phone *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500" />
-            <input required name="address" placeholder="Street Address (for delivery) *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500" />
+            <input required name="name" placeholder="Full Name *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input required name="email" type="email" placeholder="Email *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input required name="phone" placeholder="Phone *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input required name="address" placeholder="Street Address (for delivery) *" onChange={handleFormChange} className="p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm" />
             <div className="col-span-full flex justify-end">
-              <button type="submit" className={`px-6 py-2 text-white rounded-full font-semibold transition`} style={{backgroundColor: BLUE}}>
+              <button type="submit" className={`px-4 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
                 Proceed to Fee Payment &rarr;
               </button>
             </div>
@@ -473,14 +483,14 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
 
       case 2: 
         return (
-          <div className="text-center p-6">
-            <h4 className="font-bold text-2xl mb-4" style={{color: BLUE}}>2. Application Fee Required</h4>
+          <div className="text-center p-4 sm:p-6">
+            <h4 className="font-bold text-xl sm:text-2xl mb-4" style={{color: BLUE}}>2. Application Fee Required</h4>
             <div className="inline-block p-4 border-b-4 border-gray-200 mb-6">
-                <p className="text-xl text-gray-700">A refundable application fee is required to reserve the vehicle.</p>
-                <p className="text-5xl font-extrabold mt-3" style={{color: NAVY}}>${depositAmount.toFixed(2)}</p>
+                <p className="text-lg sm:text-xl text-gray-700">A refundable application fee is required to reserve the vehicle.</p>
+                <p className="text-4xl sm:text-5xl font-extrabold mt-3" style={{color: NAVY}}>${depositAmount.toFixed(2)}</p>
             </div>
             
-            <button onClick={() => setFlowStep(3)} className={`mt-6 px-8 py-3 text-white rounded-full font-semibold text-lg shadow-lg transition`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(3)} className={`mt-6 px-6 py-3 text-white rounded-full font-semibold text-lg shadow-lg transition`} style={{backgroundColor: BLUE}}>
                 Select Payment Method &rarr;
             </button>
           </div>
@@ -488,11 +498,11 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
         
       case 3: 
         return (
-          <div className="text-center p-6">
+          <div className="text-center p-4 sm:p-6">
             <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>3. Select Crypto Payment Method</h4>
-            <p className="text-gray-600 mb-6">Select a network to display the corresponding wallet address for the **${depositAmount.toFixed(2)}** fee.</p>
+            <p className="text-sm sm:text-base text-gray-600 mb-6">Select a network to display the corresponding wallet address for the **${depositAmount.toFixed(2)}** fee.</p>
 
-            <select onChange={(e) => { handleCryptoSelect(e); setFlowStep(4); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium">
+            <select onChange={(e) => { handleCryptoSelect(e); setFlowStep(4); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium text-sm">
                 <option value="" disabled>-- Choose Cryptocurrency --</option>
                 {Object.keys(CRYPTO_WALLETS).map(key => (
                     <option key={key} value={key}>{key}</option>
@@ -503,20 +513,20 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
         
       case 4: 
         return (
-          <div className="text-center p-6">
+          <div className="text-center p-4 sm:p-6">
             <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>4. Send Application Fee Payment</h4>
-            <p className="text-lg text-gray-700 mb-4">Send exactly **${depositAmount.toFixed(2)}** to the following {selectedCrypto} address:</p>
+            <p className="text-sm sm:text-lg text-gray-700 mb-4">Send exactly **${depositAmount.toFixed(2)}** to the following {selectedCrypto} address:</p>
             
-            <div className="mt-4 p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
-              <p className="font-mono text-base break-all text-gray-800">{walletInfo.address}</p>
+            <div className="mt-4 p-4 sm:p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
+              <p className="font-mono text-xs sm:text-base break-all text-gray-800">{walletInfo.address}</p>
               <div className="flex justify-center mt-3">
                   <CopyToClipboard text={walletInfo.address} />
               </div>
             </div>
             
-            <p className="text-sm text-gray-500 mt-2">Network: {walletInfo.network}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-2">Network: {walletInfo.network}</p>
             
-            <button onClick={() => setFlowStep(5)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(5)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
               I Have Sent the Payment &rarr;
             </button>
           </div>
@@ -528,17 +538,17 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 6: 
         const deliveryAddress = `${purchaseFormData.address}`;
         return (
-          <div className="text-center p-6">
-            <h4 className="font-bold text-2xl mb-4 text-green-600">6. Application Approved!</h4>
-            <p className="text-lg text-gray-700">Your application is approved. Review your final delivery details for the **{car.name}**.</p>
+          <div className="text-center p-4 sm:p-6">
+            <h4 className="font-bold text-xl sm:text-2xl mb-4 text-green-600">6. Application Approved!</h4>
+            <p className="text-sm sm:text-lg text-gray-700">Your application is approved. Review your final delivery details for the **{car.name}**.</p>
             
-            <div className="mt-6 p-5 bg-green-50 rounded-xl border border-green-300 text-left mx-auto max-w-lg shadow-md">
+            <div className="mt-6 p-4 sm:p-5 bg-green-50 rounded-xl border border-green-300 text-left mx-auto max-w-lg shadow-md text-sm">
                 <p className="font-semibold text-gray-800">Recipient: {purchaseFormData.name}</p>
                 <p className="font-semibold text-gray-800">Email: {purchaseFormData.email}</p>
                 <p className="font-semibold text-gray-800 mt-3">Delivery Location: <span className="text-green-700 font-medium">{deliveryAddress}</span></p>
             </div>
 
-            <button onClick={() => setFlowStep(7)} className={`mt-6 px-6 py-2 text-white rounded-full font-semibold transition`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(7)} className={`mt-6 px-6 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
               Confirm & Proceed to Final Car Payment &rarr;
             </button>
           </div>
@@ -546,12 +556,12 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
 
       case 7: 
         return (
-          <div className="text-center p-6">
+          <div className="text-center p-4 sm:p-6">
             <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>7. Select Final Car Payment Method</h4>
             <p className="text-lg text-gray-700">Final Price: <span className="font-extrabold text-3xl" style={{color: NAVY}}>{car.price}</span></p>
-            <p className="text-gray-600 mt-2 mb-6">Select a network to display the corresponding wallet address for the final payment.</p>
+            <p className="text-sm sm:text-base text-gray-600 mt-2 mb-6">Select a network to display the corresponding wallet address for the final payment.</p>
 
-            <select onChange={(e) => { setSelectedCrypto(e.target.value); setFlowStep(8); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium">
+            <select onChange={(e) => { setSelectedCrypto(e.target.value); setFlowStep(8); }} value={selectedCrypto} className="w-full max-w-md p-3 border border-gray-300 rounded-lg bg-white appearance-none text-gray-700 font-medium text-sm">
                 <option value="" disabled>-- Choose Cryptocurrency --</option>
                 {Object.keys(CRYPTO_WALLETS).map(key => (
                     <option key={key} value={key}>{key}</option>
@@ -562,20 +572,20 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
         
       case 8: 
         return (
-          <div className="text-center p-6">
+          <div className="text-center p-4 sm:p-6">
             <h4 className="font-bold text-xl mb-4" style={{color: BLUE}}>8. Send Final Payment</h4>
-            <p className="text-lg text-gray-700 mb-4">Send exactly **{car.price}** to the following {selectedCrypto} address:</p>
+            <p className="text-sm sm:text-lg text-gray-700 mb-4">Send exactly **{car.price}** to the following {selectedCrypto} address:</p>
             
-            <div className="mt-4 p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
-              <p className="font-mono text-base break-all text-gray-800">{walletInfo.address}</p>
+            <div className="mt-4 p-4 sm:p-5 bg-gray-100 rounded-xl border border-blue-300 mx-auto max-w-xl shadow-inner">
+              <p className="font-mono text-xs sm:text-base break-all text-gray-800">{walletInfo.address}</p>
               <div className="flex justify-center mt-3">
                   <CopyToClipboard text={walletInfo.address} />
               </div>
             </div>
             
-            <p className="text-sm text-gray-500 mt-2">Network: {walletInfo.network}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-2">Network: {walletInfo.network}</p>
 
-            <button onClick={() => setFlowStep(9)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition`} style={{backgroundColor: BLUE}}>
+            <button onClick={() => setFlowStep(9)} className={`mt-8 px-6 py-2 text-white rounded-full font-semibold transition text-sm`} style={{backgroundColor: BLUE}}>
               I Have Sent the Final Payment &rarr;
             </button>
           </div>
@@ -587,11 +597,11 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
       case 10: 
         const finalDeliveryAddress = `${purchaseFormData.address}`;
         return (
-          <div className="text-center p-6">
-            <h4 className="font-bold text-2xl mb-4 text-green-600">10. Purchase Complete! 🎉</h4>
-            <p className="text-lg text-gray-700">Your **{car.name}** purchase is confirmed.</p>
+          <div className="text-center p-4 sm:p-6">
+            <h4 className="font-bold text-xl sm:text-2xl mb-4 text-green-600">10. Purchase Complete! 🎉</h4>
+            <p className="text-sm sm:text-lg text-gray-700">Your **{car.name}** purchase is confirmed.</p>
             
-            <div className="mt-6 p-5 bg-green-50 rounded-xl border border-green-300 text-left mx-auto max-w-lg shadow-md">
+            <div className="mt-6 p-4 sm:p-5 bg-green-50 rounded-xl border border-green-300 text-left mx-auto max-w-lg shadow-md text-sm">
                 <p className="font-semibold text-gray-800">Car: {car.name}</p>
                 <p className="font-semibold text-gray-800">Delivery Address: {purchaseFormData.name}, {finalDeliveryAddress}</p>
                 <p className="font-bold text-green-700 mt-3">Expected Delivery Window: 7-10 Business Days</p>
@@ -609,13 +619,14 @@ function PurchaseFlow({ car, flowStep, setFlowStep, purchaseFormData, setFormDat
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 sm:py-16">
-        <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-10 border-t-8 border-blue-600">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold text-gray-900">
+    // MOBILE FIX: Tighter horizontal padding on the main container
+    <div className="max-w-4xl mx-auto px-2 sm:px-4 py-8 sm:py-16"> 
+        <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-10 border-t-8 border-blue-600"> {/* MOBILE FIX: Tighter interior padding */}
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900"> {/* MOBILE FIX: Smaller font size */}
                     <span style={{color: BLUE}}>Purchase Flow:</span> {car.name}
                 </h2>
-                <span className={`text-xl font-bold ${flowStep >= totalSteps ? 'text-green-600' : 'text-blue-600'}`}>
+                <span className={`text-base sm:text-xl font-bold ${flowStep >= totalSteps ? 'text-green-600' : 'text-blue-600'}`}> {/* MOBILE FIX: Smaller font size */}
                     Step {flowStep} / {totalSteps}
                 </span>
             </div>
@@ -693,18 +704,18 @@ export default function App(){
         purchaseActive={purchaseStep > 0}
       />
       
-      <main className="pb-12">
+      <main className="pb-8 sm:pb-12"> {/* MOBILE FIX: Tighter bottom padding */}
         {renderPage()}
       </main>
 
-      <footer className="border-t mt-12 text-white" style={{backgroundColor: NAVY}}>
-        <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-sm text-gray-400">
+      <footer className="border-t mt-8 sm:mt-12 text-white" style={{backgroundColor: NAVY}}> {/* MOBILE FIX: Tighter top margin */}
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4"> {/* MOBILE FIX: Tighter padding and gap */}
+          <div className="text-xs sm:text-sm text-gray-400">
             © {new Date().getFullYear()} BYD Motor Hubs. All rights reserved.
           </div>
           <div className="flex gap-4">
-            <a href="#" className="text-sm text-blue-400 hover:text-blue-500 transition-colors">Privacy Policy</a>
-            <a href="#" className="text-sm text-blue-400 hover:text-blue-500 transition-colors">Terms of Use</a>
+            <a href="#" className="text-xs sm:text-sm text-blue-400 hover:text-blue-500 transition-colors">Privacy Policy</a>
+            <a href="#" className="text-xs sm:text-sm text-blue-400 hover:text-blue-500 transition-colors">Terms of Use</a>
           </div>
         </div>
       </footer>
